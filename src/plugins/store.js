@@ -10,6 +10,7 @@ export default new Vuex.Store({
       login: "login",
       email: "my@gmail.com"
     },
+    lastStaffId: 5,
     staff: [
       { id: 1, name: { first: 'John', last: 'Doe', middle: 'Vasilievich' }, phone: '+380664480075', sex: 1, added:'2018-06-11', salary: 12000, position: 'Engeneer' },
       { id: 2, name: { first: 'Jane', last: 'Doe' }, sex: 1, added:'2018-11-12', salary: 12000, position: 'Engeneer' },
@@ -38,8 +39,13 @@ export default new Vuex.Store({
     },
     removeStaff (state, staffId) {
       let index = this.getters.getIndexById(staffId);
-      //if (index >= 0)
+      if (index >= 0)
         state.staff.splice(index, 1);
+    },
+    addStaff (state, staffData) {
+      staffData.id = state.lastStaffId;
+      state.lastStaffId++;
+      state.staff.push(staffData);
     },
     login (state, userData) {
       state.auth.status = true;
@@ -55,6 +61,9 @@ export default new Vuex.Store({
     },
     removeStaff ({ commit, state }, staffData) {
       commit('removeStaff', staffData);
+    },
+    addStaff ({ commit, state }, staffData) {
+      commit('addStaff', staffData);
     },
     login ({ commit, state }, userData) {
       commit('login', userData);

@@ -23,7 +23,7 @@
         </b-form-input>
       </b-form-group>
 
-      <b-button @click="login()" variant="primary">Sign in</b-button>
+      <b-button @click="doLogin()" variant="primary">Sign in</b-button>
     </b-form>
   </b-card>
 </template>
@@ -51,6 +51,10 @@ export default {
     ...mapActions([
       'login'
     ]),
+    doLogin() {
+      this.login();
+      this.$router.push({name:'Home'});
+    },
     onSubmit (evt) {
       evt.preventDefault();
       alert(JSON.stringify(this.form));

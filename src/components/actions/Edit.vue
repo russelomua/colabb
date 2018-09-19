@@ -1,9 +1,8 @@
 <template>
-  <b-card :header="`Edit id: ${$route.params.id}`"
+  <b-card :header="`${headerTitle} ${staffData.name.first} ${staffData.name.last}`"
           border-variant="primary"
           header-bg-variant="primary"
-          header-text-variant="white"
-          class="m-3">
+          header-text-variant="white">
     <b-form>
       <b-row>
         <input type="hidden" v-model="staffData.name.id" />
@@ -100,8 +99,9 @@
       </b-row>
       
       <div class="float-right">
-        <b-button variant="danger" @click="buttonRemove()">Remove</b-button>
-        <b-button variant="link" @click="buttonSave()">Save</b-button>
+        <b-button v-if="isEdit" variant="danger" @click="buttonRemove()">Remove</b-button>
+        <b-button v-if="isEdit" variant="link" @click="buttonSave()">Save</b-button>
+        <b-button v-if="isAdd" variant="link" @click="buttonAdd()">Add</b-button>
       </div>
     </b-form>
   </b-card>
@@ -121,13 +121,25 @@ export default {
   },
   computed: {
     staffData() {
+      if (this.isAdd)
+        return { name: { first: '', last: '', middle: '' } };
       return this.$store.getters.getStaffById(this.$route.params.id);
+    },
+    isEdit() {
+      return typeof this.$route.params.id !== 'undefined';
+    },
+    isAdd() {
+      return typeof this.$route.params.id === 'undefined';
+    },
+    headerTitle() {
+      return (this.isEdit ? 'Edit' : 'Add');
     }
   },
   methods: {
     ...mapActions([
       'saveStaff',
-      'removeStaff'
+      'removeStaff',
+      'addStaff'
     ]),
     buttonSave() {
       this.saveStaff(this.staffData);
@@ -135,6 +147,10 @@ export default {
     },
     buttonRemove() {
       this.removeStaff(this.staffData.id);
+      this.$router.push({ name: 'Home' });
+    },
+    buttonAdd() {
+      this.addStaff(this.staffData);
       this.$router.push({ name: 'Home' });
     },
   }

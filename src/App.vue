@@ -3,7 +3,9 @@
     <b-navbar toggleable variant="light">
         <b-navbar-brand :to="{ name: 'Home' }">colabb<sup>(oard)</sup></b-navbar-brand>
           <b-navbar-nav class="ml-auto float-right" >
-            <b-nav-item v-if="authStatus" @click="logout()">Sign out</b-nav-item>
+            <b-nav-item pills variant="success" v-if="authStatus" :to="{ name: 'Add' }">Add new collaborator</b-nav-item>
+            <b-nav-item v-if="authStatus" @click="doLogout()">Sign out</b-nav-item>
+            
             <b-nav-item v-if="!authStatus" :to="{ name: 'Login' }">Sign in</b-nav-item>
             <b-nav-item v-if="!authStatus" :to="{ name: 'Register' }">Sign on</b-nav-item>
           </b-navbar-nav>
@@ -26,7 +28,11 @@ export default {
   methods: {
     ...mapActions([
       'logout'
-    ])
+    ]),
+    doLogout() {
+      this.logout();
+      this.$router.push({name: 'Login'});
+    }
   }
 }
 </script>
