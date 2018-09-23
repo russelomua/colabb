@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import router from './router'
 
 Vue.use(Vuex);
 
@@ -7,8 +8,7 @@ export default new Vuex.Store({
   state: {
     auth: {
       status: false,
-      login: "login",
-      email: "my@gmail.com"
+      user: {}
     },
     lastStaffId: 5,
     staff: [
@@ -28,6 +28,9 @@ export default new Vuex.Store({
     },
     authStatus: state => {
       return state.auth.status;
+    },
+    authUser: state => {
+      return state.auth.user;
     }
   },
   //sync
@@ -47,28 +50,66 @@ export default new Vuex.Store({
       state.lastStaffId++;
       state.staff.push(staffData);
     },
-    login (state, userData) {
-      state.auth.status = true;
+    replaceAllStaff (state, staffs) {
+      state.staff = staffs;
     },
-    logout (state, userData) {
+    login (state, userData) {
+      localStorage.setItem('token', userData.token);
+      
+      state.auth.user = userData;
+      state.auth.status = true;
+      router.push({name: "Home"});
+    },
+    logout (state) {
+      localStorage.removeItem('token');
+      
+      state.auth.user = {};
       state.auth.status = false;
+      router.push({name: "Login"});
     }
   },
   //aSync
   actions: {
-    saveStaff ({ commit, state }, staffData) {
+    loadStaff ({ commit }) {
+      return new Promise((resolve, reject) => {
+        Vue.http.post('api/staff/')
+          .then(response => {
+            commit('replaceAllStaff', response.body);
+            resolve(response)
+          })
+          .catch(err => reject(err));
+      })
+    },
+    saveStaff ({ commit }, staffData) {
       commit('saveStaff', staffData);
     },
-    removeStaff ({ commit, state }, staffData) {
+    removeStaff ({ commit }, staffData) {
       commit('removeStaff', staffData);
     },
-    addStaff ({ commit, state }, staffData) {
+    addStaff ({ commit }, staffData) {
       commit('addStaff', staffData);
     },
-    login ({ commit, state }, userData) {
-      commit('login', userData);
+    loginAction ({ commit }, userData) {
+      return new Promise((resolve, reject) => {
+        Vue.http.post('auth/', userData)
+          .then(response => {
+            commit('login', response.body);
+            resolve(response)
+          })
+          .catch(err => reject(err));
+      })
     },
-    logout ({ commit, state }, userData) {
+    loginRestore ({ commit }, token) {
+      return new Promise((resolve, reject) => {
+        Vue.http.get('auth/', {headers: {'x-access-token': token}})
+          .then(response => {
+            commit('login', response.body);
+            resolve(response)
+          })
+          .catch(err => reject(err));
+      })
+    },
+    logout ({ commit }, userData) {
       commit('logout', userData);
     },
   }

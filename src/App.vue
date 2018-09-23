@@ -4,10 +4,16 @@
         <b-navbar-brand :to="{ name: 'Home' }">colabb<sup>(oard)</sup></b-navbar-brand>
           <b-navbar-nav class="ml-auto float-right" >
             <b-nav-item pills variant="success" v-if="authStatus" :to="{ name: 'Add' }">Add new collaborator</b-nav-item>
-            <b-nav-item v-if="authStatus" @click="doLogout()">Sign out</b-nav-item>
+            <b-nav-item-dropdown right v-if="authStatus">
+              <!-- Using button-content slot -->
+              <template slot="button-content">
+                <em>{{`${authUser.login} (${authUser.email})`}}</em>
+              </template>
+              <b-dropdown-item  @click="doLogout()">Sign out</b-dropdown-item>
+            </b-nav-item-dropdown>
             
             <b-nav-item v-if="!authStatus" :to="{ name: 'Login' }">Sign in</b-nav-item>
-            <b-nav-item v-if="!authStatus" :to="{ name: 'Register' }">Sign on</b-nav-item>
+            <b-nav-item v-if="!authStatus" :to="{ name: 'Register' }">Sign up</b-nav-item>
           </b-navbar-nav>
       </b-navbar>
     <div class="m-3">
@@ -22,17 +28,25 @@ export default {
   name: 'app',
   computed: {
      ...mapGetters([
-      'authStatus'
-    ])
+      'authStatus',
+      'authUser'
+    ]),
+    authToken() {
+      return localStorage.getItem('token');
+    }
   },
   methods: {
     ...mapActions([
-      'logout'
+      'logout',
+      'loginRestore'
     ]),
     doLogout() {
       this.logout();
       this.$router.push({name: 'Login'});
     }
+  },
+  mounted() {
+    this.loginRestore(this.authToken);
   }
 }
 </script>

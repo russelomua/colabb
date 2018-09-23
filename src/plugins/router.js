@@ -7,58 +7,54 @@ import Register from '../components/Register'
 
 import Edit from '../components/actions/Edit'
 
-import store from './store'
-
 Vue.use(Router)
 
-const ifNotAuthenticated = (to, from, next) => {
-  if (!store.getters.authStatus) {
-    next()
-    return
-  }
-  next('/')
-}
-
-const ifAuthenticated = (to, from, next) => {
-  if (store.getters.authStatus) {
-    next()
-    return
-  }
-  next({name: 'Login'})
-}
-
-export default new Router({
+const router = new Router({
 //  mode: 'history',
   routes: [
     {
       path: '/',
       name: 'Home',
       component: Home,
-      beforeEnter: ifAuthenticated
+      meta: { public: false }
     },
     {
       path: '/add',
       name: 'Add',
       component: Edit,
-      beforeEnter: ifAuthenticated
+      meta: { public: false }
     },
     {
       path: '/edit/:id',
       name: 'Edit',
       component: Edit,
-      beforeEnter: ifAuthenticated
+      meta: { public: false }
     },
     {
       path: '/register',
       name: 'Register',
       component: Register,
-      beforeEnter: ifNotAuthenticated
+      meta: { public: true }
     },
     {
       path: '/sign-in',
       name: 'Login',
       component: Login,
-      beforeEnter: ifNotAuthenticated
+      meta: { public: true }
     }
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const authRequired = !to.meta.public;
+  const loggedIn = localStorage.getItem('token');
+
+  if (authRequired && !loggedIn)
+    return next({name: 'Login'});
+  if (!authRequired && loggedIn)
+    return next({name: 'Home'});
+  
+  next();
+})
+
+export default router;

@@ -3,6 +3,7 @@ import App from './App.vue'
 
 //plugins
 import './plugins/bootstrap'
+import './plugins/resource'
 import store from './plugins/store'
 import router from './plugins/router'
 

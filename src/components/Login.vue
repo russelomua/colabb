@@ -2,7 +2,7 @@
   <b-card title="Login Page"
           style="max-width: 50%;"
           class="m-5 ml-auto mr-auto">
-    <b-form @submit="onSubmit" v-if="show">
+    <b-form>
       <b-form-group label="Your login:"
                     label-for="login">
         <b-form-input id="login"
@@ -34,41 +34,15 @@ import { mapActions } from 'vuex'
 export default {
   data () {
     return {
-      form: {
-        email: '',
-        name: '',
-        food: null,
-        checked: []
-      },
-      foods: [
-        { text: 'Select One', value: null },
-        'Carrots', 'Beans', 'Tomatoes', 'Corn'
-      ],
-      show: true
+      form: {}
     }
   },
   methods: {
     ...mapActions([
-      'login'
+      'loginAction'
     ]),
     doLogin() {
-      this.login();
-      this.$router.push({name:'Home'});
-    },
-    onSubmit (evt) {
-      evt.preventDefault();
-      alert(JSON.stringify(this.form));
-    },
-    onReset (evt) {
-      evt.preventDefault();
-      /* Reset our form values */
-      this.form.email = '';
-      this.form.name = '';
-      this.form.food = null;
-      this.form.checked = [];
-      /* Trick to reset/clear native browser form validation state */
-      this.show = false;
-      this.$nextTick(() => { this.show = true });
+      this.loginAction(this.form)
     }
   }
 }
