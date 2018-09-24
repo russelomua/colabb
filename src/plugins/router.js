@@ -12,8 +12,12 @@ Vue.use(Router)
 const router = new Router({
 //  mode: 'history',
   routes: [
+    { path: '/list/:page?', redirect: (to) => {
+        return { name: "Home", params: {page: (to.params.page ? to.params.page : 1)}};
+      }
+    },
     {
-      path: '/',
+      path: '/list/:page',
       name: 'Home',
       component: Home,
       meta: { public: false }

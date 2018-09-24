@@ -3,15 +3,16 @@
           border-variant="primary"
           header-bg-variant="primary"
           header-text-variant="white">
-    <b-form>
+    <b-form @submit.prevent="onSubmit">
       <b-row>
-        <input type="hidden" v-model="staffData.name.id" />
+        <input type="hidden" name="_id" :value="staffData._id" />
         <b-col md="4" sm="6" xs="12">
           <b-form-group label="First name:"
                         label-for="name_first">
             <b-form-input id="name_first"
+                          name="name.first"
                           type="text"
-                          v-model="staffData.name.first"
+                          :value="staffData.name.first"
                           required
                           placeholder="Worker's first name">
             </b-form-input>
@@ -21,9 +22,9 @@
           <b-form-group label="Middle name:"
                         label-for="name_middle">
             <b-form-input id="name_middle"
+                          name="name.middle"
                           type="text"
-                          v-model="staffData.name.middle"
-                          required
+                          :value="staffData.name.middle"
                           placeholder="Worker's middle name">
             </b-form-input>
           </b-form-group>
@@ -32,8 +33,9 @@
           <b-form-group label="Last name:"
                         label-for="name_last">
             <b-form-input id="name_last"
+                          name="name.last"
                           type="text"
-                          v-model="staffData.name.last"
+                          :value="staffData.name.last"
                           required
                           placeholder="Worker's last name">
             </b-form-input>
@@ -44,8 +46,11 @@
           <b-form-group label="Phone nubmer:"
                         label-for="phone">
             <b-form-input id="phone"
-                          type="text"
-                          v-model="staffData.phone"
+                          name="phone"
+                          type="tel"
+                          pattern="(\+?\d*){7,13}"
+                          title="Phone number from 7 to 13 digit"
+                          :value="staffData.phone"
                           required
                           placeholder="Worker's contact phone">
             </b-form-input>
@@ -55,11 +60,10 @@
         <b-col md="4" sm="6" xs="12">
           <b-form-group label="Sex:"
                         label-for="sex">
-            <b-form-radio-group id="sex"
-                                buttons
-                                button-variant="light"
-                                v-model="staffData.sex"
-                                :options="sexOptions" />
+            <b-form-select id="sex"
+                           name="sex"
+                           :value="staffData.sex"
+                           :options="sexOptions" />
           </b-form-group>
         </b-col>
         
@@ -67,9 +71,9 @@
           <b-form-group label="Added date:"
                         label-for="added">
             <b-form-input id="added"
+                          name="added"
                           type="date"
-                          v-model="staffData.added"
-                          required>
+                          :value="staffData.added | moment().format('YYYY-MM-DD')">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -78,8 +82,9 @@
           <b-form-group label="Salary:"
                         label-for="salary">
             <b-form-input id="salary"
+                          name="salary"
                           type="number"
-                          v-model="staffData.salary"
+                          :value="staffData.salary"
                           min="0.00" max="100000.00" step="0.01"
                           required>
             </b-form-input>
@@ -90,8 +95,9 @@
           <b-form-group label="Position:"
                         label-for="position">
             <b-form-input id="position"
+                          name="position"
                           type="text"
-                          v-model="staffData.position"
+                          :value="staffData.position"
                           required>
             </b-form-input>
           </b-form-group>
@@ -100,8 +106,7 @@
       
       <div class="float-right">
         <b-button v-if="isEdit" variant="danger" @click="buttonRemove()">Remove</b-button>
-        <b-button v-if="isEdit" variant="link" @click="buttonSave()">Save</b-button>
-        <b-button v-if="isAdd" variant="link" @click="buttonAdd()">Add</b-button>
+        <b-button type="submit" variant="link">Save</b-button>
       </div>
     </b-form>
   </b-card>
@@ -113,6 +118,7 @@ import { mapActions } from 'vuex'
 export default {
   data () {
     return {
+      form: {},
       sexOptions: [
         { text: 'Male', value: 1 },
         { text: 'Female', value: 0 },
@@ -141,18 +147,46 @@ export default {
       'removeStaff',
       'addStaff'
     ]),
-    buttonSave() {
-      this.saveStaff(this.staffData);
-      this.$router.push({ name: 'Home' });
+    onSubmit(e) {
+      e.preventDefault();
+      
+      let formData = this.formSerialize(e.target);
+      this.form = formData;
+      
+      //return;
+      if (this.isEdit)
+        this.saveStaff(formData).then(() => {
+          this.$router.push({ name: 'Home' });
+        });
+    
+      if (this.isAdd)
+        this.addStaff(formData).then(() => {
+          this.$router.push({ name: 'Home' });
+        });
+    
+      
     },
     buttonRemove() {
-      this.removeStaff(this.staffData.id);
+      this.removeStaff(this.staffData._id);
       this.$router.push({ name: 'Home' });
     },
     buttonAdd() {
-      this.addStaff(this.staffData);
-      this.$router.push({ name: 'Home' });
+      
     },
+    formSerialize(from) {
+      const formData = new FormData(from);
+      let object = {};
+      for (const [fieldKey, field] of formData.entries()) {
+        let [key, subkey] = fieldKey.split('.');
+        if (typeof subkey == 'undefined')
+          object[key] = field;
+        else {
+          object[key] = (typeof object[key] == 'undefined' ? {} : object[key]);
+          object[key][subkey] = field;
+        }
+      }
+      return object;
+    }
   }
 }
 </script>

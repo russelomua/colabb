@@ -1,29 +1,41 @@
 <template>
-  <b-table :fields="fields" :items="staff">
-    <!-- A virtual column -->
+<div>
+  <b-table :per-page="tablePerPage" :current-page="tableCurrent" responsive :fields="fields" :items="getStaff">
     <template slot="index" slot-scope="data">
-      {{data.index + 1}}
+      {{data.index + (tableCurrent-1)*tablePerPage + 1}}
     </template>
-    <!-- A custom formatted column -->
+    
     <template slot="name" slot-scope="data">
       {{data.value.last}} {{data.value.first}} {{data.value.middle}}
     </template>
-    <!-- A virtual composite column -->
-    <template slot="actions" slot-scope="data">
-      <b-button variant="link" size="sm" :to="{name:'Edit', params: {id: data.item.id}}" class="mr-2">edit</b-button>
 
-      <b-button variant="danger" @click="removeStaff(data.item.id)" size="sm">delete</b-button>
+    <template slot="sex" slot-scope="data">
+      {{(data.value == 0 ? "Female" : "Male")}}
+    </template>
+
+    <template slot="added" slot-scope="data">
+      {{data.value | moment().format('DD MMM YYYY')}}
+    </template>
+    
+    <template slot="actions" slot-scope="data">
+      <b-button variant="link" size="sm" :to="{name:'Edit', params: {id: data.item._id}}" class="mr-2">edit</b-button>
+
+      <b-button variant="danger" @click="removeStaff(data.item._id)" size="sm">delete</b-button>
     </template>
   </b-table>
-
+  <b-pagination-nav align="center" :use-router="true" :limit="tableLimit" :number-of-pages="getStaffPages" :link-gen="linkGen" v-model="tableCurrent"></b-pagination-nav>
+</div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   data () {
     return {
+      tablePerPage: 10,
+      tableCurrent: 1,
+      tableLimit: 10,
       //ФИО, пол, контактная информация, дата добавления, оклад, должность.
       fields: [
         'index',
@@ -38,32 +50,30 @@ export default {
     }
   },
   computed: {
-    staff() {
-      return this.$store.state.staff;
-    }
+    ...mapGetters([
+      'authStatus',
+      'getStaff',
+      'getStaffLenght'
+    ]),
+    getStaffPages() {
+      this.tableCurrent = this.$route.params.page*1;
+      return this.getStaffLenght / this.tableLimit;
+    },
   },
   methods: {
     ...mapActions([
+      'loadStaff',
       'removeStaff'
-    ])
+    ]),
+    linkGen (pageNum) {
+      return { name: "Home", params: {page: pageNum}};
+    }
+  },
+  watch: {
+    authStatus: function (newVal, oldVal) {
+      if ((newVal != oldVal) && (newVal == true))
+        this.loadStaff();
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
