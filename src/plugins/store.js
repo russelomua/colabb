@@ -66,7 +66,7 @@ export default new Vuex.Store({
       state.auth.status = true;
       
       Vue.http.headers.common['x-access-token'] = userData.token;
-      router.push({name: "Home", params: {page: ( this.$route.params.page ? this.$route.params.page : 1)}});
+      router.push({name: "Home", params: {page: ( router.history.current.params.page ? router.history.current.params.page : 1)}});
     },
     logout (state) {
       localStorage.removeItem('token');
@@ -131,7 +131,10 @@ export default new Vuex.Store({
             commit('login', response.body);
             resolve(response)
           })
-          .catch(err => reject(err));
+          .catch(err => {
+            commit('logout');
+            resolve(err);
+          });
       })
     },
     loginRestore ({ commit }, token) {
@@ -141,7 +144,10 @@ export default new Vuex.Store({
             commit('login', response.body);
             resolve(response)
           })
-          .catch(err => reject(err));
+          .catch(err => {
+            commit('logout');
+            resolve(err);
+          });
       })
     },
     logout ({ commit }, userData) {

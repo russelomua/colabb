@@ -1,6 +1,6 @@
 <template>
 <div>
-  <b-table :per-page="tablePerPage" :current-page="tableCurrent" responsive :fields="fields" :items="getStaff">
+  <b-table :per-page="tablePerPage" sort-by="_id" :current-page="tableCurrent" responsive :fields="fields" :items="getStaff">
     <template slot="index" slot-scope="data">
       {{data.index + (tableCurrent-1)*tablePerPage + 1}}
     </template>
@@ -23,7 +23,7 @@
       <b-button variant="danger" @click="removeStaff(data.item._id)" size="sm">delete</b-button>
     </template>
   </b-table>
-  <b-pagination-nav align="center" :use-router="true" :limit="tableLimit" :number-of-pages="getStaffPages" :link-gen="linkGen" v-model="tableCurrent"></b-pagination-nav>
+  <b-pagination-nav align="center" :use-router="true" :limit="tablePerPage" :number-of-pages="getStaffPages" :link-gen="linkGen" v-model="tableCurrent"></b-pagination-nav>
 </div>
 </template>
 
@@ -33,9 +33,8 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
   data () {
     return {
-      tablePerPage: 10,
+      tablePerPage: 15,
       tableCurrent: 1,
-      tableLimit: 10,
       //ФИО, пол, контактная информация, дата добавления, оклад, должность.
       fields: [
         'index',
@@ -57,7 +56,7 @@ export default {
     ]),
     getStaffPages() {
       this.tableCurrent = this.$route.params.page*1;
-      return this.getStaffLenght / this.tableLimit;
+      return Math.ceil(this.getStaffLenght / this.tablePerPage);
     },
   },
   methods: {
@@ -74,6 +73,9 @@ export default {
       if ((newVal != oldVal) && (newVal == true))
         this.loadStaff();
     }
+  },
+  mounted(){
+    this.loadStaff();
   }
 }
 </script>

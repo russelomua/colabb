@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Home from '../components/Home'
+import User from '../components/User'
 import Login from '../components/Login'
 import Register from '../components/Register'
 
@@ -10,15 +11,18 @@ import Edit from '../components/actions/Edit'
 Vue.use(Router)
 
 const router = new Router({
-//  mode: 'history',
+  mode: 'history',
   routes: [
-    { path: '/list/:page?', redirect: (to) => {
-        return { name: "Home", params: {page: (to.params.page ? to.params.page : 1)}};
+    { 
+      path: '/list/:page?',
+      name: 'Home',
+      redirect: (to) => {
+        return { name: "HomeWithPage", params: {page: (to.params.page ? to.params.page : 1)}};
       }
     },
     {
       path: '/list/:page',
-      name: 'Home',
+      name: 'HomeWithPage',
       component: Home,
       meta: { public: false }
     },
@@ -32,6 +36,12 @@ const router = new Router({
       path: '/edit/:id',
       name: 'Edit',
       component: Edit,
+      meta: { public: false }
+    },
+    {
+      path: '/user',
+      name: 'User',
+      component: User,
       meta: { public: false }
     },
     {

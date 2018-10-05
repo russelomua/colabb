@@ -1,8 +1,8 @@
 <template>
   <b-card :header="`${headerTitle} ${staffData.name.first} ${staffData.name.last}`"
-          border-variant="primary"
-          header-bg-variant="primary"
-          header-text-variant="white">
+          border-variant="default"
+          header-bg-variant="default"
+          header-text-variant="default">
     <b-form @submit.prevent="onSubmit">
       <b-row>
         <input type="hidden" name="_id" :value="staffData._id" />

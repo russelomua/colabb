@@ -9,7 +9,8 @@
               <template slot="button-content">
                 <em>{{`${authUser.login} (${authUser.email})`}}</em>
               </template>
-              <b-dropdown-item  @click="doLogout()">Sign out</b-dropdown-item>
+              <b-dropdown-item :to="{ name: 'User' }">Profile</b-dropdown-item>
+              <b-dropdown-item @click="doLogout()">Sign out</b-dropdown-item>
             </b-nav-item-dropdown>
             
             <b-nav-item v-if="!authStatus" :to="{ name: 'Login' }">Sign in</b-nav-item>
@@ -17,7 +18,8 @@
           </b-navbar-nav>
       </b-navbar>
     <div class="m-3">
-    <router-view></router-view></div>
+      <router-view></router-view>
+    </div>
   </b-container>
 </template>
 
