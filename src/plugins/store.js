@@ -123,9 +123,16 @@ export default new Vuex.Store({
     changeStaffPage ({ commit }, page) {
       commit('changeStaffPage', page);
     },
-    
+    changePasswordAction ({ commit }, newPassword) {
+      return new Promise((resolve) => {
+        Vue.http.post('api/user/', newPassword)
+          .then(response => {
+            resolve(response.body)
+          })
+      })
+    },
     loginAction ({ commit }, userData) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         Vue.http.post('auth/', userData)
           .then(response => {
             commit('login', response.body);
@@ -138,7 +145,7 @@ export default new Vuex.Store({
       })
     },
     loginRestore ({ commit }, token) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         Vue.http.get('auth/', {headers: {'x-access-token': token}})
           .then(response => {
             commit('login', response.body);
@@ -152,6 +159,6 @@ export default new Vuex.Store({
     },
     logout ({ commit }, userData) {
       commit('logout', userData);
-    },
+    }
   }
 })

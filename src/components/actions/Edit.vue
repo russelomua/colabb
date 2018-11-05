@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -126,6 +126,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'lastStaffPage'
+    ]),
     staffData() {
       if (this.isAdd)
         return { name: { first: '', last: '', middle: '' } };
@@ -156,22 +159,22 @@ export default {
       //return;
       if (this.isEdit)
         this.saveStaff(formData).then(() => {
-          this.$router.push({ name: 'Home' });
+          this.redirectToHome();
         });
     
       if (this.isAdd)
         this.addStaff(formData).then(() => {
-          this.$router.push({ name: 'Home' });
+          this.redirectToHome();
         });
     
       
     },
     buttonRemove() {
       this.removeStaff(this.staffData._id);
-      this.$router.push({ name: 'Home' });
+      this.redirectToHome();
     },
-    buttonAdd() {
-      
+    redirectToHome() {
+      this.$router.push({ name: 'Home', params: {page: this.lastStaffPage} });
     },
     formSerialize(from) {
       const formData = new FormData(from);

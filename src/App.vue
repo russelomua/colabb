@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-navbar toggleable variant="light">
-        <b-navbar-brand :to="{ name: 'Home' }">colabb<sup>(oard)</sup></b-navbar-brand>
+        <b-navbar-brand :to="{ name: 'Home', params: {page: lastStaffPage} }">colabb<sup>(oard)</sup></b-navbar-brand>
           <b-navbar-nav class="ml-auto float-right" >
             <b-nav-item pills variant="success" v-if="authStatus" :to="{ name: 'Add' }">Add new collaborator</b-nav-item>
             <b-nav-item-dropdown right v-if="authStatus">
@@ -31,7 +31,8 @@ export default {
   computed: {
      ...mapGetters([
       'authStatus',
-      'authUser'
+      'authUser',
+      'lastStaffPage'
     ]),
     authToken() {
       return localStorage.getItem('token');

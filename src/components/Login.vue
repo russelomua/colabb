@@ -24,11 +24,10 @@
                       v-model="form.password"
                       :state="passwordState"
                       aria-describedby="inputPasswordFeedback"
-                      required
                       placeholder="Enter password">
         </b-form-input>
         <b-form-invalid-feedback id="inputPasswordFeedback">
-          This is a required field and must be at least 3 characters
+          This is a required field and must be at least 6 characters
         </b-form-invalid-feedback>
       </b-form-group>
       
@@ -64,7 +63,7 @@
         },
         password: {
           required,
-          minLength: minLength(3)
+          minLength: minLength(6)
         }
       }
     },

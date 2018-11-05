@@ -55,14 +55,14 @@ export default {
       'getStaffLenght'
     ]),
     getStaffPages() {
-      this.tableCurrent = this.$route.params.page*1;
       return Math.ceil(this.getStaffLenght / this.tablePerPage);
-    },
+    }
   },
   methods: {
     ...mapActions([
       'loadStaff',
-      'removeStaff'
+      'removeStaff',
+      'changeStaffPage'
     ]),
     linkGen (pageNum) {
       return { name: "Home", params: {page: pageNum}};
@@ -72,10 +72,14 @@ export default {
     authStatus: function (newVal, oldVal) {
       if ((newVal != oldVal) && (newVal == true))
         this.loadStaff();
+    },
+    tableCurrent: function(newPage) {
+      this.changeStaffPage(newPage);
     }
   },
   mounted(){
-    this.loadStaff();
+    if (this.authStatus)
+      this.loadStaff();
   }
 }
 </script>
